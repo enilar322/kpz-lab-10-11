@@ -34,3 +34,19 @@ jobs:
           context: .
           push: true
           tags: ghcr.io/${{ github.actor }}/${{ github.event.repository.name }}:latest
+
+  deploy-to-azure:
+    needs: build-and-push
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Azure Login
+        uses: azure/login@v2
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+      - name: Deploy to Azure Web App
+        uses: azure/webapps-deploy@v2
+        with:
+          app-name: kpz-lab-front
+          images: ghcr.io/${{ github.repository_owner }}/${{ github.event.repository.name }}:latest
